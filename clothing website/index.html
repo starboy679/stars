@@ -227,17 +227,13 @@
                             <button type="submit" class="place-order-btn" id="place-order-btn"><i
                                     class="fas fa-rocket"></i>Order</button>
                     </form>
-                    <div id="orderSuccess"
-                        style="display:none; padding:20px; background:#d4edda; color:#155724; border:1px solid #c3e6cb; border-radius:5px; margin-top:20px;">
-                        <i class="fas fa-check-circle"></i> Your order has been placed successfully! You will receive a
-                        confirmation email shortly.
-                    </div>
 
                 </div>
             </div>
         </div>
 
     </main>
+
     <!-- Footer -->
     <footer class="footer">
 
@@ -298,6 +294,17 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Order Success Modal -->
+    <div class="success-modal-overlay" id="successModalOverlay">
+        <div class="success-modal-content">
+            <div class="success-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h2>Order Placed!</h2>
+            <p>Thank you for your purchase. You will receive a confirmation email shortly.</p>
         </div>
     </div>
 

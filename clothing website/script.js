@@ -333,18 +333,22 @@ async function processOrder(event) {
         renderCart();
         selectPayment('credit', document.querySelector('.payment-method[onclick*="credit"]'));
         hideCheckOut();
-
-        // Show success message
-        const orderSuccessDiv = document.getElementById('orderSuccess');
-        orderSuccessDiv.style.display = 'block';
-
-        // Close the cart modal after showing the success message
         ToggleCart();
 
-        // Hide the success message after 5 seconds
+        // Show the new success modal
+        const successModal = document.getElementById('successModalOverlay');
+        successModal.style.display = 'flex';
+        setTimeout(() => successModal.classList.add('active'), 10);
+
+        // After 3 seconds, hide the modal and scroll to top
         setTimeout(() => {
-            orderSuccessDiv.style.display = 'none';
-        }, 5000);
+            successModal.classList.remove('active');
+            setTimeout(() => {
+                successModal.style.display = 'none';
+                // Scroll to the top of the page smoothly
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }, 400); // Wait for fade out transition
+        }, 3000); // Keep modal visible for 3 seconds
 
     } catch (error) {
         console.error('Form submission error:', error);
