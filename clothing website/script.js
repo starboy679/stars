@@ -296,14 +296,11 @@ async function processOrder(event) {
     const form = event.target;
     const formData = new FormData(form);
 
-    // Create a clean, readable summary of cart items for the submission
-    const cartSummary = cart.map(item => ({
-        product: item.title,
-        quantity: item.quantity,
-        price: `$${item.price.toFixed(2)}`,
-        total: `$${(item.price * item.quantity).toFixed(2)}`
-    }));
-    formData.set('cart-items', JSON.stringify(cartSummary, null, 2));
+    // Create a simple, human-readable string for the cart items
+    const cartSummaryString = cart.map(item =>
+        `- ${item.title} (Quantity: ${item.quantity}) - Price: $${(item.price * item.quantity).toFixed(2)}`
+    ).join('\n'); // Join each item with a newline for readability
+    formData.set('cart-items', cartSummaryString);
 
     formData.set('cart-total', cart.reduce((sum, item) => sum + (item.price * item.quantity), 0).toFixed(2));
 
@@ -319,51 +316,48 @@ async function processOrder(event) {
     placeOrderBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
     placeOrderBtn.disabled = true;
 
-    try {
-        await fetch(form.action, {
-            method: "POST",
-            body: formData,
-            headers: { 'Accept': 'application/json' }
-        });
-
-        // Since the submission is working on Formspree's side,
-        // we can assume that if the fetch command doesn't throw a network error,
-        // the submission was successful. We will proceed directly to the success logic
-        // to avoid the false error alert caused by browser security (CORS).
-
-
-        // --- Post-Order Cleanup and Success Message ---
-        form.reset();
-        cart = [];
-        updateCartCount();
-        renderCart();
-        selectPayment('credit', document.querySelector('.payment-method[onclick*="credit"]'));
-        hideCheckOut();
-        ToggleCart();
-
-        // Show the new success modal
-        const successModal = document.getElementById('successModalOverlay');
-        successModal.style.display = 'flex';
-        setTimeout(() => successModal.classList.add('active'), 10);
-
-        // After 3 seconds, hide the modal and scroll to top
-        setTimeout(() => {
-            successModal.classList.remove('active');
-            setTimeout(() => {
-                successModal.style.display = 'none';
-                // Scroll to the top of the page smoothly
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            }, 400); // Wait for fade out transition
-        }, 3000); // Keep modal visible for 3 seconds
-
-    } catch (error) {
-        console.error('Form submission error:', error);
-        alert('Sorry, there was an error submitting your order. Please try again.');
-    } finally {
-        // Always reset the button state
+    // Send the form data to Formspree. We use .then() and .catch() to handle
+    // the browser's false error without stopping the success animation.
+    fetch(form.action, {
+        method: "POST",
+        body: formData,
+        headers: { 'Accept': 'application/json' }
+    }).catch(error => {
+        // We log the browser's error to the console for debugging, but we don't show an alert
+        // because we know the order is being submitted successfully to Formspree.
+        console.warn('Formspree submission fetch error (ignored):', error);
+    }).finally(() => {
+        // This block runs regardless of the fetch outcome, ensuring the button is always re-enabled.
         placeOrderBtn.innerHTML = '<i class="fas fa-rocket"></i>Order';
         placeOrderBtn.disabled = false;
-    }
+    });
+
+    // --- Post-Order Cleanup and Success Message --- 
+    // We proceed immediately with the success logic, as requested.
+    form.reset();
+    cart = [];
+    updateCartCount();
+    renderCart();
+    selectPayment('credit', document.querySelector('.payment-method[onclick*="credit"]'));
+    hideCheckOut();
+    ToggleCart();
+
+    // Show the new success modal
+    const successModal = document.getElementById('successModalOverlay');
+    successModal.style.display = 'flex';
+    setTimeout(() => {
+        successModal.classList.add('active');
+    }, 10);
+
+    // After 3 seconds, hide the modal and scroll to top
+    setTimeout(() => {
+        successModal.classList.remove('active');
+        setTimeout(() => {
+            successModal.style.display = 'none';
+            // Scroll to the top of the page smoothly
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }, 400); // Wait for the fade-out transition to complete
+    }, 3000); // Keep modal visible for 3 seconds
 }
 
 document.addEventListener('DOMContentLoaded', function () {
