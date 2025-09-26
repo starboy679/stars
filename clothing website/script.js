@@ -313,12 +313,18 @@ async function processOrder(event) {
     placeOrderBtn.disabled = true;
 
     try {
-        await fetch(form.action, {
+        const response = await fetch(form.action, {
             method: "POST",
             // Formspree works best with FormData directly or JSON
-            headers: { 'Accept': 'application/json' },
-            body: new URLSearchParams(formData).toString(),
+            body: formData,
+            headers: { 'Accept': 'application/json' }
         });
+
+        if (!response.ok) {
+            // If the server response is not OK, throw an error to be caught by the catch block
+            const errorData = await response.json();
+            throw new Error(errorData.error || `Server responded with status: ${response.status}`);
+        }
 
         // --- Post-Order Cleanup and Success Message ---
         form.reset();
