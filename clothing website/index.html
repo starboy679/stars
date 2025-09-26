@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stars Clothing</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://kit.fontawesome.com/a250ab5f6f.js" crossorigin="anonymous"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <header class="header">
+        <nav class="nav">
+            <button class="menu-btn" onclick="toggleMenu()">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+            <div class="logo"><a href="#home" class="logo-link">Stars Clothing</a></div>
+            <div class="nav-actions">
+                <button class="cart-btn" onclick="ToggleCart()">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    <span class="cart-count" id="cart-count">0</span>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Side Menu -->
+    <div class="side-menu-overlay" id="sideMenuOverlay" onclick="closeMenu()"></div>
+    <div class="side-menu" id="sideMenu">
+        <div class="side-menu-header">
+            <div class="logo">Stars</div>
+            <button class="close-menu-btn" onclick="closeMenu()">×</button>
+        </div>
+        <ul class="nav-links">
+            <li><a href="#home" onclick="closeMenu()">Home</a></li>
+            <li><a href="#products" onclick="closeMenu()">Products</a></li>
+            <li><a href="#about" onclick="closeMenu()">About</a></li> <!-- Assuming you have an about section -->
+            <li><a href="#" onclick="toggleSideMenuContact(event)">Contact</a></li>
+        </ul>
+        <div class="side-menu-contact" id="contact">
+            <button class="side-menu-back-btn" onclick="toggleSideMenuContact(event)">
+                <i class="fas fa-arrow-left"></i> Back
+            </button>
+            <h2>Let's Chat</h2>
+            <p>Whatsapp: 9849584628</p>
+            <p>Insta: @starboy_249</p>
+        </div>
+        <div class="side-menu-about" id="about">
+            <button class="side-menu-back-btn" onclick="toggleSideMenuContact(event)">
+                <i class="fas fa-arrow-left"></i> Back
+            </button>
+            <h2>Out of our World</h2>
+            <p>some thing thats make you a STAR</p>
+            
+        </div>
+    </div>
+
+    <!--HERO SEACTION-->
+
+    <section class="hero" id="home">
+        <div class="hero-carousel">
+            <!-- 
+                
+                To add more images, copy one of the lines below and change the image URL.
+                The JavaScript will automatically include it in the rotation.
+                Note: Only the very first image should have the 'active' class.
+            -->
+            <div class="hero-bg active" style="background-image: url('bg.jpg');"></div>
+            <div class="hero-bg" style="background-image: url('products-pics/shirts/shirt 1.jpg');"></div>
+            <div class="hero-bg" style="background-image: url('products-pics/women/dress 1.jpg');"></div>
+            <div class="hero-bg" style="background-image: url('products-pics/pants/pants 1.jpg');"></div>
+            <div class="hero-bg" style="background-image: url('products-pics/t shits/t shirt 2.jpg');"></div>
+        </div>
+        <div class="hero-content">
+            <h1>Premium Fashion</h1>
+            <p>Stars Collection For You To Be The STAR</p>
+            <a href="#products" class="cta-btn">Shop</a>
+        </div>
+    </section>
+    <main class="main-content">
+
+        <!--Products Section-->
+        <section class="products" id="products">
+
+
+            <div class="section-title">
+                <h2>Featured Colleaction</h2>
+                <p>Pieces for the modren wardrobe</p>
+            </div>
+            <div class="filters">
+                <button class="filter-btn active" onclick="filterProducts('all', this)">ALL ITEMS</button>
+                <button class="filter-btn" onclick="filterProducts('men', this)">MEN</button>
+                <button class="filter-btn" onclick="filterProducts('women', this)">WOMEN</button>
+                <button class="filter-btn" onclick="filterProducts('accessories', this)">ACCESSORIES</button>
+
+            </div>
+
+            <div class="product-showcase" id="productShowcase">
+                <!-- Product rows will be generated here by JavaScript -->
+            </div>
+        </section>
+
+        <!--Cart model-->
+        <div class="cart-model" id="cartModel">
+            <div class="cart-content">
+                <div class="cart-header">
+                    <i class="fa fa-shopping-bag cart-header-icon" aria-hidden="true"></i>
+                    <h3>Shopping Cart</h3>
+                    <button class="close-cart">
+                        <i class="fa fa-times" aria-hidden="true" onclick="ToggleCart()"></i>
+                    </button>
+                </div>
+                <div id="cartItems">
+                    <div class="empty-cart">
+                        <div class="empty-cart-icon">
+                            <i class="fas fa-shopping-cart"></i>
+                        </div>
+                        <p>Your Cart is empty</p>
+                    </div>
+                </div>
+
+                <div class="cart-total" id="cartTotal">
+                    <div class="total-price" id="totalPrice">Total : $0.00</div>
+                    <button class="check-out-btn" onclick="showCheckOut()">Proceed to Check Out</button>
+                </div>
+
+                <div class="checkout-form" id="checkOutForm">
+                    <button class="back-to-cart" onclick="hideCheckOut()"><i class="fas fa-arrow-left"></i> Back to
+                        Cart</button>
+
+                <form name="order" method="post" data-netlify="true" onsubmit="processOrder(event)" autocomplete="off">
+                        <input type="hidden" name="form-name" value="order">
+                        <!-- Hidden field for Netlify to capture the selected payment method -->
+                        <input type="hidden" name="payment-method" id="paymentMethodInput">
+                    <!-- Hidden fields for Netlify to recognize cart data -->
+                    <input type="hidden" name="cart-items">
+                    <input type="hidden" name="cart-total">
+                        <div class="form-section">
+                            <h4><i class="fas fa-box"></i> Shipping informaion</h4>
+                            <div class="form-group">
+                                <label for="fullName">Full Name </label>
+                                <input type="text" id="fullName" name="fullName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email </label>
+                                <input type="email" id="email" name="email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="phone">Phone </label>
+                                <input type="tel" id="phone" name="phone" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="address">Address </label>
+                                <input type="text" id="address" name="address" required>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="city">City </label>
+                                    <input type="text" id="city" name="city" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="zipCode">ZIP Code </label>
+                                    <input type="text" id="zipCode" name="zipCode" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="country">Country </label>
+                                    <select name="country" id="country" required>
+                                        <option value="SUD">Sudan</option>
+                                        <option value="KSA">Saudi Arabia</option>
+                                        <option value="EGY">Egypt</option>
+                                        <option value="IND">India</option>
+                                        <option value="UAE">United Arab Emrats</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-section">
+                                <h4><i class="fa fa-credit-card" aria-hidden="true"></i>Payment Information</h4>
+                                <div class="payment-methods">
+                                    <div class="payment-method active" onclick="selectPayment('credit', this)"><i
+                                            class="fa fa-credit-card" aria-hidden="true"></i> Credit Card</div>
+                                    <div class="payment-method" onclick="selectPayment('cod', this)"><i
+                                            class="fas fa-money-bill-wave" aria-hidden="true"></i> Cash on Delivery
+                                    </div>
+                                    <div class="payment-method" onclick="selectPayment('apple', this)"><i
+                                            class="fab fa-apple-pay apple-icon" aria-hidden="true"></i> Apple Pay</div>
+
+                                </div>
+
+                                <!--credit Payment-->
+                                <div id="creditCardForm">
+                                    <div class="form-group">
+                                        <label for="cardName">Name on Card</label>
+                                        <input type="text" id="cardName" name="cardName" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="cardNumber">Card Number</label>
+                                        <input type="text" id="cardNumber" name="cardNumber" inputmode="numeric"
+                                            placeholder="1234 5678 9012 3456" required maxlength="19">
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="expireDate">Expiry Date</label>
+                                            <input type="date" id="expireDate" name="expireDate" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="cvvCode">CVV </label>
+                                            <input type="number" id="cvvCode" name="cvvCode" required>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--applePay Payment-->
+                            </div>
+                            <div class="order-summary">
+                                <h4>Order Summary</h4>
+                                <div id="orderItems"></div>
+                            </div>
+                            <div class="total-price" id="checkOutTotal">Total: $0.00</div>
+                            <button type="submit" class="place-order-btn" id="place-order-btn"><i
+                                    class="fas fa-rocket"></i>Order</button>
+                    </form>
+                    <div id="orderSuccess"
+                        style="display:none; padding:20px; background:#d4edda; color:#155724; border:1px solid #c3e6cb; border-radius:5px; margin-top:20px;">
+                        <i class="fas fa-check-circle"></i> Your order has been placed successfully! You will receive a
+                        confirmation email shortly.
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </main>
+    <!-- Footer -->
+    <footer class="footer">
+
+        <div class="footer-content">
+            
+            <div class="footer-links">
+                <a href="#privacy" onclick="showSection('privacy')">Privacy Policy</a>
+                <a href="#terms" onclick="showSection('terms')">Terms of Services</a>
+                <a href="#returns" onclick="showSection('returns')">Returns & Exchange</a>
+                <a href="#shipping" onclick="showSection('shipping')">Shipping Info</a>
+                <a href="#support" onclick="showSection('support')">Customer Support</a>
+            </div>
+
+        </div>
+        <div class="section" id="privacy">
+            <h1>Privacy Policy</h1>
+            <p>Your choice, Payment information and address are all secrite no one have accsess to them </p>
+        </div>
+        <div class="section" id="terms">
+            <h1>Terms of Services</h1>
+            <p>WE can serve you any time any where </p>
+        </div>
+        <div class="section" id="returns">
+            <h1>Returns & Exchange</h1>
+            <p>you can return your order within 2 days by contacting the Customert Care</p>
+        </div>
+        <div class="section" id="shipping">
+            <h1>Shipping Info</h1>
+            <p>you and the shipping department has the access only to your Address </p>
+        </div>
+        
+
+        <p style="margin-top: 15px; padding-bottom: 15px; font-size: 12px;">&copy; 2025 STARS Fashion. All rights reserved</p>
+    </footer>
+
+
+
+    <!--product bkur bacground-->
+    <div class="product-modal-overlay" id="productModalOverlay">
+        <div class="product-modal-content" id="productModalContent">
+            <button class="close-modal-btn" onclick="closeProductModal()">×</button>
+            <div class="modal-grid">
+                <div class="modal-image-gallery">
+                    <img src="" alt="Main product image" class="modal-main-image" id="modalMainImage">
+                    <div class="modal-thumbnails" id="modalThumbnails">
+                        <!-- Thumbnails will be generated here -->
+                    </div>
+                </div>
+                <div class="modal-product-details">
+                    <h2 class="modal-product-title" id="modalProductTitle"></h2>
+                    <p class="modal-product-category" id="modalProductCategory"></p>
+                    <div class="modal-product-rating" id="modalProductRating"></div>
+                    <div class="modal-product-price" id="modalProductPrice"></div>
+                    <p class="modal-product-description" id="modalProductDescription"></p>
+                    <div class="modal-buttons">
+                        <button class="add-to-cart modal-add-to-cart-btn" id="modalAddToCartBtn">Add to Cart</button>
+                        <button class="buy-now modal-buy-now-btn" id="modalBuyNowBtn">Buy Now</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <script src="script.js"></script>
+</body>
+
+</html>
