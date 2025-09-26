@@ -313,9 +313,10 @@ async function processOrder(event) {
     placeOrderBtn.disabled = true;
 
     try {
-        await fetch("/", {
+        await fetch(form.action, {
             method: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            // Formspree works best with FormData directly or JSON
+            headers: { 'Accept': 'application/json' },
             body: new URLSearchParams(formData).toString(),
         });
 

@@ -135,8 +135,7 @@
                     <button class="back-to-cart" onclick="hideCheckOut()"><i class="fas fa-arrow-left"></i> Back to
                         Cart</button>
 
-                <form name="order" method="post" data-netlify="true" onsubmit="processOrder(event)" autocomplete="off">
-                        <input type="hidden" name="form-name" value="order">
+                <form action="https://formspree.io/f/mrbybnkw" method="POST" onsubmit="processOrder(event)" autocomplete="off">
                         <!-- Hidden field for Netlify to capture the selected payment method -->
                         <input type="hidden" name="payment-method" id="paymentMethodInput">
                     <!-- Hidden fields for Netlify to recognize cart data -->
