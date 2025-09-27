@@ -335,41 +335,42 @@ document.addEventListener('DOMContentLoaded', function () {
             if (checkoutForm.checkValidity()) {
                 if (cart.length === 0) return;
 
+                // Populate hidden fields
+                const cartSummaryString = cart.map(item =>
+                    `- ${item.title} (Quantity: ${item.quantity}) - Price: $${(item.price * item.quantity).toFixed(2)}`
+                ).join('\n');
+                document.querySelector('input[name="cart-items"]').value = cartSummaryString;
+                document.querySelector('input[name="cart-total"]').value = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0).toFixed(2);
+
+                // Remove credit card fields if not credit payment
+                if (currentPaymentMethod !== 'credit') {
+                    const cardFields = ['cardName', 'cardNumber', 'expireDate', 'cvvCode'];
+                    cardFields.forEach(field => {
+                        const input = document.querySelector(`input[name="${field}"]`);
+                        if (input) input.remove();
+                    });
+                }
+
                 // Disable button and show a loading state
                 placeOrderBtn.disabled = true;
                 placeOrderBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Placing Order...';
 
                 const formData = new FormData(checkoutForm);
 
-                // Use fetch to send the form data to the URL from the 'action' attribute
+                // Store order details
+                localStorage.setItem('orderCart', JSON.stringify(cart));
+                localStorage.setItem('orderTotal', cart.reduce((sum, item) => sum + (item.price * item.quantity), 0).toFixed(2));
+
+                // Redirect immediately
+                window.location.href = 'success.html';
+
+                // Submit in background
                 fetch(checkoutForm.action, {
                     method: 'POST',
-                    body: formData,
-                    headers: {
-                        'Accept': 'application/json'
-                    }
-                }).then(response => {
-                    if (response.ok) {
-                        // Store order details for the success page
-                        localStorage.setItem('orderCart', JSON.stringify(cart));
-                        localStorage.setItem('orderTotal', cart.reduce((sum, item) => sum + (item.price * item.quantity), 0).toFixed(2));
-
-                        // Reset form and clear cart
-                        checkoutForm.reset();
-                        cart = [];
-                        updateCartCount();
-                        renderCart();
-                        
-                        // Redirect to success page
-                        window.location.href = 'success.html';
-                    } else {
-                        // Handle submission errors
-                        alert('There was a problem with your submission. Please try again.');
-                        placeOrderBtn.disabled = false;
-                        placeOrderBtn.innerHTML = '<i class="fas fa-rocket"></i> Place Order';
-                    }
+                    body: formData
                 }).catch(error => {
-                    alert('An error occurred. Please check your connection and try again.');
+                    console.warn('Form submission error:', error);
+                }).finally(() => {
                     placeOrderBtn.disabled = false;
                     placeOrderBtn.innerHTML = '<i class="fas fa-rocket"></i> Place Order';
                 });
