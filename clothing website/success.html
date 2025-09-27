@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Success - Stars Clothing</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://kit.fontawesome.com/a250ab5f6f.js" crossorigin="anonymous"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+</head>
+
+<body style="background-color: black;">
+    <header class="header">
+        <nav class="nav">
+            <button class="menu-btn" onclick="toggleMenu()">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+            <div class="logo"><a href="index.html" class="logo-link">Stars Clothing</a></div>
+            
+        </nav>
+    </header>
+
+    <!-- Side Menu -->
+    <div class="side-menu-overlay" id="sideMenuOverlay" onclick="closeMenu()"></div>
+    <div class="side-menu" id="sideMenu">
+        <div class="side-menu-header">
+            <div class="logo">Stars</div>
+            <button class="close-menu-btn" onclick="closeMenu()">×</button>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html" onclick="closeMenu()">Home</a></li>
+            <li><a href="index.html#products" onclick="closeMenu()">Products</a></li>
+            <li><a href="#" onclick="toggleSideMenuContact(event)">Contact</a></li>
+        </ul>
+        <div class="side-menu-contact" id="contact">
+            <button class="side-menu-back-btn" onclick="toggleSideMenuContact(event)">
+                <i class="fas fa-arrow-left"></i> Back
+            </button>
+            <h2>Let's Chat</h2>
+            <p>Whatsapp: 9849584628</p>
+            <p>Insta: @starboy_249</p>
+        </div>
+    </div>
+
+    <main class="main-content">
+        <section class="success-section">
+            <div class="success-container">
+                <div class="success-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h1>Order Placed Successfully!</h1>
+                <p>Thank you for your purchase. You will receive a confirmation email shortly.</p>
+                <div class="order-details" id="orderDetails">
+                    <!-- Order details will be populated here -->
+                </div>
+                <a href="index.html" class="cta-btn">Continue Shopping</a>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer" >
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="#privacy" onclick="showSection('privacy')">Privacy Policy</a>
+                <a href="#terms" onclick="showSection('terms')">Terms of Services</a>
+                <a href="#returns" onclick="showSection('returns')">Returns & Exchange</a>
+                <a href="#shipping" onclick="showSection('shipping')">Shipping Info</a>
+                <a href="#support" onclick="showSection('support')">Customer Support</a>
+            </div>
+        </div>
+        <div class="section" id="privacy">
+            <h1>Privacy Policy</h1>
+            <p>Your choice, Payment information and address are all secret no one has access to them</p>
+        </div>
+        <div class="section" id="terms">
+            <h1>Terms of Services</h1>
+            <p>WE can serve you any time any where</p>
+        </div>
+        <div class="section" id="returns">
+            <h1>Returns & Exchange</h1>
+            <p>You can return your order within 2 days by contacting Customer Care</p>
+        </div>
+        <div class="section" id="shipping">
+            <h1>Shipping Info</h1>
+            <p>You and the shipping department have the access only to your Address</p>
+        </div>
+
+        <p style="margin-top: 15px; padding-bottom: 15px; font-size: 12px;">&copy; 2025 STARS Fashion. All rights reserved</p>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+        // Load order details from localStorage
+        document.addEventListener('DOMContentLoaded', function() {
+            const orderDetails = document.getElementById('orderDetails');
+            const cart = JSON.parse(localStorage.getItem('orderCart') || '[]');
+            const total = localStorage.getItem('orderTotal') || '0.00';
+
+            if (cart.length > 0) {
+                orderDetails.innerHTML = `
+                    <h2>Order Summary</h2>
+                    <div class="order-items">
+                        ${cart.map(item => `
+                            <div class="order-item">
+                                <span class="order-item-title">${item.title}</span>
+                                <span class="order-item-quantity">x${item.quantity}</span>
+                                <span class="order-item-price">$${(item.price * item.quantity).toFixed(2)}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="order-total">
+                        <strong>Total: $${total}</strong>
+                    </div>
+                `
+            } else {
+                orderDetails.innerHTML = '<p>No order details available.</p>';
+            }
+
+            // Clear localStorage after displaying
+            localStorage.removeItem('orderCart');
+            localStorage.removeItem('orderTotal');
+        });
+    </script>
+</body>
+
+</html>
