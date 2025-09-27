@@ -283,8 +283,8 @@ function selectPayment(method, element) {
         document.getElementById('cvvCode').required = false;
     }
 
-    // Update the hidden input field for Netlify
-    document.getElementById('paymentMethodInput').value = method;
+    // Update the hidden input field
+    document.getElementById('paymentMethodInput').value = method.toUpperCase();
 }
 
 document.addEventListener('DOMContentLoaded', function () {
