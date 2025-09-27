@@ -251,6 +251,11 @@ function showCheckOut() {
             <span class="order-item-price">$${(item.price * item.quantity).toFixed(2)}</span>
         </div>
     `).join('');
+
+    // Calculate and display the total in the checkout form
+    const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    document.getElementById('checkOutTotal').textContent = `Total: $${total.toFixed(2)}`;
+
 }
 function hideCheckOut() {
 
@@ -271,13 +276,13 @@ function selectPayment(method, element) {
         creditCardForm.style.display = 'block';
         // Set required for credit card fields
         document.getElementById('cardName').required = true;
-        document.getElementById('cardNumber').required = true;
+        document.getElementById('cardNumber').required = true; 
         document.getElementById('expireDate').required = true;
         document.getElementById('cvvCode').required = true;
     } else {
         creditCardForm.style.display = 'none';
         // Remove required for credit card fields
-        document.getElementById('cardName').required = false;
+        document.getElementById('cardName').required = false; 
         document.getElementById('cardNumber').required = false;
         document.getElementById('expireDate').required = false;
         document.getElementById('cvvCode').required = false;
