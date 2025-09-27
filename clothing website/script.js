@@ -241,7 +241,6 @@ function showCheckOut() {
     document.getElementById('cartItems').style.display = 'none';
     document.getElementById('cartTotal').style.display = 'none';
     document.getElementById('checkOutForm').classList.add('active');
-    document.getElementById('checkOutForm').style.display = 'block'; // Make sure the form is visible
 
     // Populate order summary
     const orderItems = document.getElementById('orderItems');
@@ -258,7 +257,7 @@ function hideCheckOut() {
 
     document.getElementById('cartItems').style.display = 'block';
     document.getElementById('cartTotal').style.display = 'block';
-    document.getElementById('checkOutForm').classList.remove('active'); // Remove active class to ensure proper state
+    document.getElementById('checkOutForm').classList.remove('active'); // Use class to hide the form
 
 }
 
@@ -336,16 +335,13 @@ document.addEventListener('DOMContentLoaded', function () {
             if (checkoutForm.checkValidity()) {
                 if (cart.length === 0) return;
 
-                // Change button to show submission is in progress
+                // Disable button and show a loading state
                 placeOrderBtn.disabled = true;
                 placeOrderBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Placing Order...';
 
-                // Prepare form data for submission
                 const formData = new FormData(checkoutForm);
-                formData.set('cart-items', JSON.stringify(cart.map(item => `${item.title} (x${item.quantity})`).join(', ')));
-                formData.set('cart-total', cart.reduce((sum, item) => sum + (item.price * item.quantity), 0).toFixed(2));
 
-                // Submit the form data using fetch
+                // Use fetch to send the form data to the URL from the 'action' attribute
                 fetch(checkoutForm.action, {
                     method: 'POST',
                     body: formData,
@@ -358,18 +354,24 @@ document.addEventListener('DOMContentLoaded', function () {
                         localStorage.setItem('orderCart', JSON.stringify(cart));
                         localStorage.setItem('orderTotal', cart.reduce((sum, item) => sum + (item.price * item.quantity), 0).toFixed(2));
 
-                        // Reset everything and redirect
+                        // Reset form and clear cart
                         checkoutForm.reset();
                         cart = [];
                         updateCartCount();
                         renderCart();
+                        
+                        // Redirect to success page
                         window.location.href = 'success.html';
                     } else {
-                        // Handle server errors
-                        alert('There was a problem with your order. Please try again.');
+                        // Handle submission errors
+                        alert('There was a problem with your submission. Please try again.');
                         placeOrderBtn.disabled = false;
                         placeOrderBtn.innerHTML = '<i class="fas fa-rocket"></i> Place Order';
                     }
+                }).catch(error => {
+                    alert('An error occurred. Please check your connection and try again.');
+                    placeOrderBtn.disabled = false;
+                    placeOrderBtn.innerHTML = '<i class="fas fa-rocket"></i> Place Order';
                 });
             }
         });
