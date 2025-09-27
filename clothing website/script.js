@@ -326,70 +326,57 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Handle checkout form submission
     const checkoutForm = document.getElementById('checkout-form-element');
+    if (checkoutForm) {
+        checkoutForm.addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent the default form submission
+            const placeOrderBtn = document.getElementById('place-order-btn');
 
-if (checkoutForm) {
-    checkoutForm.addEventListener('submit', function(event) {
-        event.preventDefault(); // Prevent the default form submission
-        const placeOrderBtn = document.getElementById('place-order-btn');
+            // The checkValidity() method will trigger the browser's validation UI
+            if (checkoutForm.checkValidity()) {
+                if (cart.length === 0) return;
 
-        // ✅ تحديث الحقول المخفية قبل الإرسال
-        const cartItemsInput = checkoutForm.querySelector('input[name="cart-items"]');
-        const cartTotalInput = checkoutForm.querySelector('input[name="cart-total"]');
-        const paymentMethodInput = document.getElementById('paymentMethodInput');
+                // Disable button and show a loading state
+                placeOrderBtn.disabled = true;
+                placeOrderBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Placing Order...';
 
-        const cartItemsSummary = cart.map(item => {
-            return `${item.title} (x${item.quantity}) - $${(item.price * item.quantity).toFixed(2)}`;
-        }).join(', ');
+                const formData = new FormData(checkoutForm);
 
-        const cartTotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0).toFixed(2);
+                // Use fetch to send the form data to the URL from the 'action' attribute
+                fetch(checkoutForm.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                }).then(response => {
+                    if (response.ok) {
+                        // Store order details for the success page
+                        localStorage.setItem('orderCart', JSON.stringify(cart));
+                        localStorage.setItem('orderTotal', cart.reduce((sum, item) => sum + (item.price * item.quantity), 0).toFixed(2));
 
-        cartItemsInput.value = cartItemsSummary;
-        cartTotalInput.value = cartTotal;
-        paymentMethodInput.value = currentPaymentMethod;
-
-        if (checkoutForm.checkValidity()) {
-            if (cart.length === 0) return;
-
-            // Disable button and show a loading state
-            placeOrderBtn.disabled = true;
-            placeOrderBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Placing Order...';
-
-            const formData = new FormData(checkoutForm);
-
-            fetch(checkoutForm.action, {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'Accept': 'application/json'
-                }
-            }).then(response => {
-                if (response.ok) {
-                    // Store order details for the success page
-                    localStorage.setItem('orderCart', JSON.stringify(cart));
-                    localStorage.setItem('orderTotal', cartTotal);
-
-                    // Reset form and clear cart
-                    checkoutForm.reset();
-                    cart = [];
-                    updateCartCount();
-                    renderCart();
-
-                    // ✅ Redirect to success page
-                    window.location.href = 'success.html';
-                } else {
-                    alert('There was a problem with your submission. Please try again.');
+                        // Reset form and clear cart
+                        checkoutForm.reset();
+                        cart = [];
+                        updateCartCount();
+                        renderCart();
+                        
+                        // Redirect to success page
+                        window.location.href = 'success.html';
+                    } else {
+                        // Handle submission errors
+                        alert('There was a problem with your submission. Please try again.');
+                        placeOrderBtn.disabled = false;
+                        placeOrderBtn.innerHTML = '<i class="fas fa-rocket"></i> Place Order';
+                    }
+                }).catch(error => {
+                    alert('An error occurred. Please check your connection and try again.');
                     placeOrderBtn.disabled = false;
                     placeOrderBtn.innerHTML = '<i class="fas fa-rocket"></i> Place Order';
-                }
-            }).catch(error => {
-                alert('An error occurred. Please check your connection and try again.');
-                placeOrderBtn.disabled = false;
-                placeOrderBtn.innerHTML = '<i class="fas fa-rocket"></i> Place Order';
-            });
-        }
-    }); // ✅ دي القفلة الناقصة
-}
-
+                });
+            }
+        });
+    }
+});
 
 document.getElementById('cartModel').addEventListener('click', function (e) {
     if (e.target === this) {
@@ -562,8 +549,4 @@ document.getElementById('productModalOverlay').addEventListener('click', functio
     if (event.target === this) {
         closeProductModal();
     }
-
 });
-});
-
-
