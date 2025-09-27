@@ -251,10 +251,6 @@ function showCheckOut() {
             <span class="order-item-price">$${(item.price * item.quantity).toFixed(2)}</span>
         </div>
     `).join('');
-
-    // Calculate and display the total in the checkout form
-    const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    document.getElementById('checkOutTotal').textContent = `Total: $${total.toFixed(2)}`;
 }
 function hideCheckOut() {
 
@@ -281,10 +277,10 @@ function selectPayment(method, element) {
     } else {
         creditCardForm.style.display = 'none';
         // Remove required for credit card fields
-        document.getElementById('cardName').required = false; 
+        document.getElementById('cardName').required = false;
         document.getElementById('cardNumber').required = false;
-        document.getElementById('expireDate').required = false; // Corrected ID
-        document.getElementById('cvvCode').required = false; // Corrected ID
+        document.getElementById('expireDate').required = false;
+        document.getElementById('cvvCode').required = false;
     }
 
     // Update the hidden input field for Netlify
@@ -330,57 +326,70 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Handle checkout form submission
     const checkoutForm = document.getElementById('checkout-form-element');
-    if (checkoutForm) {
-        checkoutForm.addEventListener('submit', function(event) {
-            event.preventDefault(); // Prevent the default form submission
-            const placeOrderBtn = document.getElementById('place-order-btn');
 
-            // The checkValidity() method will trigger the browser's validation UI
-            if (checkoutForm.checkValidity()) {
-                if (cart.length === 0) return;
+if (checkoutForm) {
+    checkoutForm.addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent the default form submission
+        const placeOrderBtn = document.getElementById('place-order-btn');
 
-                // Disable button and show a loading state
-                placeOrderBtn.disabled = true;
-                placeOrderBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Placing Order...';
+        // ✅ تحديث الحقول المخفية قبل الإرسال
+        const cartItemsInput = checkoutForm.querySelector('input[name="cart-items"]');
+        const cartTotalInput = checkoutForm.querySelector('input[name="cart-total"]');
+        const paymentMethodInput = document.getElementById('paymentMethodInput');
 
-                const formData = new FormData(checkoutForm);
+        const cartItemsSummary = cart.map(item => {
+            return `${item.title} (x${item.quantity}) - $${(item.price * item.quantity).toFixed(2)}`;
+        }).join(', ');
 
-                // Use fetch to send the form data to the URL from the 'action' attribute
-                fetch(checkoutForm.action, {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'Accept': 'application/json'
-                    }
-                }).then(response => {
-                    if (response.ok) {
-                        // Store order details for the success page
-                        localStorage.setItem('orderCart', JSON.stringify(cart));
-                        localStorage.setItem('orderTotal', cart.reduce((sum, item) => sum + (item.price * item.quantity), 0).toFixed(2));
+        const cartTotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0).toFixed(2);
 
-                        // Reset form and clear cart
-                        checkoutForm.reset();
-                        cart = [];
-                        updateCartCount();
-                        renderCart();
-                        
-                        // Redirect to success page
-                        window.location.href = 'success.html';
-                    } else {
-                        // Handle submission errors
-                        alert('There was a problem with your submission. Please try again.');
-                        placeOrderBtn.disabled = false;
-                        placeOrderBtn.innerHTML = '<i class="fas fa-rocket"></i> Place Order';
-                    }
-                }).catch(error => {
-                    alert('An error occurred. Please check your connection and try again.');
+        cartItemsInput.value = cartItemsSummary;
+        cartTotalInput.value = cartTotal;
+        paymentMethodInput.value = currentPaymentMethod;
+
+        if (checkoutForm.checkValidity()) {
+            if (cart.length === 0) return;
+
+            // Disable button and show a loading state
+            placeOrderBtn.disabled = true;
+            placeOrderBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Placing Order...';
+
+            const formData = new FormData(checkoutForm);
+
+            fetch(checkoutForm.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Accept': 'application/json'
+                }
+            }).then(response => {
+                if (response.ok) {
+                    // Store order details for the success page
+                    localStorage.setItem('orderCart', JSON.stringify(cart));
+                    localStorage.setItem('orderTotal', cartTotal);
+
+                    // Reset form and clear cart
+                    checkoutForm.reset();
+                    cart = [];
+                    updateCartCount();
+                    renderCart();
+
+                    // ✅ Redirect to success page
+                    window.location.href = 'success.html';
+                } else {
+                    alert('There was a problem with your submission. Please try again.');
                     placeOrderBtn.disabled = false;
                     placeOrderBtn.innerHTML = '<i class="fas fa-rocket"></i> Place Order';
-                });
-            }
-        });
-    }
-});
+                }
+            }).catch(error => {
+                alert('An error occurred. Please check your connection and try again.');
+                placeOrderBtn.disabled = false;
+                placeOrderBtn.innerHTML = '<i class="fas fa-rocket"></i> Place Order';
+            });
+        }
+    }); // ✅ دي القفلة الناقصة
+}
+
 
 document.getElementById('cartModel').addEventListener('click', function (e) {
     if (e.target === this) {
@@ -553,4 +562,8 @@ document.getElementById('productModalOverlay').addEventListener('click', functio
     if (event.target === this) {
         closeProductModal();
     }
+
 });
+});
+
+
