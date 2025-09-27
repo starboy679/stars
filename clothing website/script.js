@@ -255,7 +255,6 @@ function showCheckOut() {
     // Calculate and display the total in the checkout form
     const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     document.getElementById('checkOutTotal').textContent = `Total: $${total.toFixed(2)}`;
-
 }
 function hideCheckOut() {
 
@@ -276,7 +275,7 @@ function selectPayment(method, element) {
         creditCardForm.style.display = 'block';
         // Set required for credit card fields
         document.getElementById('cardName').required = true;
-        document.getElementById('cardNumber').required = true; 
+        document.getElementById('cardNumber').required = true;
         document.getElementById('expireDate').required = true;
         document.getElementById('cvvCode').required = true;
     } else {
@@ -284,8 +283,8 @@ function selectPayment(method, element) {
         // Remove required for credit card fields
         document.getElementById('cardName').required = false; 
         document.getElementById('cardNumber').required = false;
-        document.getElementById('expireDate').required = false;
-        document.getElementById('cvvCode').required = false;
+        document.getElementById('expireDate').required = false; // Corrected ID
+        document.getElementById('cvvCode').required = false; // Corrected ID
     }
 
     // Update the hidden input field for Netlify
