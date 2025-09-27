@@ -258,7 +258,7 @@ function hideCheckOut() {
 
     document.getElementById('cartItems').style.display = 'block';
     document.getElementById('cartTotal').style.display = 'block';
-    document.getElementById('checkOutForm').classList.remove('active'); // Just remove the active class
+    document.getElementById('checkOutForm').classList.remove('active'); // Remove active class to ensure proper state
 
 }
 
@@ -330,24 +330,47 @@ document.addEventListener('DOMContentLoaded', function () {
     if (checkoutForm) {
         checkoutForm.addEventListener('submit', function(event) {
             event.preventDefault(); // Prevent the default form submission
+            const placeOrderBtn = document.getElementById('place-order-btn');
 
             // The checkValidity() method will trigger the browser's validation UI
             if (checkoutForm.checkValidity()) {
                 if (cart.length === 0) return;
 
-                // Store order details for the success page
-                localStorage.setItem('orderCart', JSON.stringify(cart));
-                localStorage.setItem('orderTotal', cart.reduce((sum, item) => sum + (item.price * item.quantity), 0).toFixed(2));
+                // Change button to show submission is in progress
+                placeOrderBtn.disabled = true;
+                placeOrderBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Placing Order...';
 
-                // Reset form and clear cart
-                checkoutForm.reset();
-                cart = [];
-                updateCartCount();
-                renderCart();
-                selectPayment('credit', document.querySelector('.payment-method[onclick*="credit"]'));
-                hideCheckOut();
-                ToggleCart();
-                window.location.href = 'success.html';
+                // Prepare form data for submission
+                const formData = new FormData(checkoutForm);
+                formData.set('cart-items', JSON.stringify(cart.map(item => `${item.title} (x${item.quantity})`).join(', ')));
+                formData.set('cart-total', cart.reduce((sum, item) => sum + (item.price * item.quantity), 0).toFixed(2));
+
+                // Submit the form data using fetch
+                fetch(checkoutForm.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                }).then(response => {
+                    if (response.ok) {
+                        // Store order details for the success page
+                        localStorage.setItem('orderCart', JSON.stringify(cart));
+                        localStorage.setItem('orderTotal', cart.reduce((sum, item) => sum + (item.price * item.quantity), 0).toFixed(2));
+
+                        // Reset everything and redirect
+                        checkoutForm.reset();
+                        cart = [];
+                        updateCartCount();
+                        renderCart();
+                        window.location.href = 'success.html';
+                    } else {
+                        // Handle server errors
+                        alert('There was a problem with your order. Please try again.');
+                        placeOrderBtn.disabled = false;
+                        placeOrderBtn.innerHTML = '<i class="fas fa-rocket"></i> Place Order';
+                    }
+                });
             }
         });
     }
