@@ -231,7 +231,7 @@ function ToggleCart() {
         }, 10);
     }
 
-    hideCheckout();
+    hideCheckOut();
 
 }
 
@@ -241,6 +241,7 @@ function showCheckOut() {
     document.getElementById('cartItems').style.display = 'none';
     document.getElementById('cartTotal').style.display = 'none';
     document.getElementById('checkOutForm').classList.add('active');
+    document.getElementById('checkOutForm').style.display = 'block'; // Make sure the form is visible
 
     // Populate order summary
     const orderItems = document.getElementById('orderItems');
@@ -257,8 +258,7 @@ function hideCheckOut() {
 
     document.getElementById('cartItems').style.display = 'block';
     document.getElementById('cartTotal').style.display = 'block';
-    document.getElementById('checkOutForm').classList.remove('active');
-    document.getElementById('checkOutForm').style.display = 'none';
+    document.getElementById('checkOutForm').classList.remove('active'); // Just remove the active class
 
 }
 
@@ -286,78 +286,6 @@ function selectPayment(method, element) {
 
     // Update the hidden input field for Netlify
     document.getElementById('paymentMethodInput').value = method;
-}
-
-async function processOrder(event) {
-    event.preventDefault();
-
-    if (cart.length === 0) return;
-
-    const form = event.target;
-    const formData = new FormData(form);
-
-    // Create a simple, human-readable string for the cart items
-    const cartSummaryString = cart.map(item =>
-        `- ${item.title} (Quantity: ${item.quantity}) - Price: $${(item.price * item.quantity).toFixed(2)}`
-    ).join('\n'); // Join each item with a newline for readability
-    formData.set('cart-items', cartSummaryString);
-
-    formData.set('cart-total', cart.reduce((sum, item) => sum + (item.price * item.quantity), 0).toFixed(2));
-
-    // **Improvement:** Only include credit card info if the payment method is 'credit'
-    if (currentPaymentMethod !== 'credit') {
-        formData.delete('cardName');
-        formData.delete('cardNumber');
-        formData.delete('expireDate');
-        formData.delete('cvvCode');
-    }
-
-    const placeOrderBtn = document.getElementById('place-order-btn');
-    placeOrderBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
-    placeOrderBtn.disabled = true;
-
-    // Send the form data to Formspree. We use .then() and .catch() to handle
-    // the browser's false error without stopping the success animation.
-    fetch(form.action, {
-        method: "POST",
-        body: formData,
-        headers: { 'Accept': 'application/json' }
-    }).catch(error => {
-        // We log the browser's error to the console for debugging, but we don't show an alert
-        // because we know the order is being submitted successfully to Formspree.
-        console.warn('Formspree submission fetch error (ignored):', error);
-    }).finally(() => {
-        // This block runs regardless of the fetch outcome, ensuring the button is always re-enabled.
-        placeOrderBtn.innerHTML = '<i class="fas fa-rocket"></i>Order';
-        placeOrderBtn.disabled = false;
-    });
-
-    // --- Post-Order Cleanup and Success Message --- 
-    // We proceed immediately with the success logic, as requested.
-    form.reset();
-    cart = [];
-    updateCartCount();
-    renderCart();
-    selectPayment('credit', document.querySelector('.payment-method[onclick*="credit"]'));
-    hideCheckOut();
-    ToggleCart();
-
-    // Show the new success modal
-    const successModal = document.getElementById('successModalOverlay');
-    successModal.style.display = 'flex';
-    setTimeout(() => {
-        successModal.classList.add('active');
-    }, 10);
-
-    // After 3 seconds, hide the modal and scroll to top
-    setTimeout(() => {
-        successModal.classList.remove('active');
-        setTimeout(() => {
-            successModal.style.display = 'none';
-            // Scroll to the top of the page smoothly
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }, 400); // Wait for the fade-out transition to complete
-    }, 3000); // Keep modal visible for 3 seconds
 }
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -395,6 +323,33 @@ document.addEventListener('DOMContentLoaded', function () {
             e.target.value = e.target.value.replace(/[*0-9]/g,'*').substring(0,4);
 
         })
+    }
+
+    // Handle checkout form submission
+    const checkoutForm = document.getElementById('checkout-form-element');
+    if (checkoutForm) {
+        checkoutForm.addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            // The checkValidity() method will trigger the browser's validation UI
+            if (checkoutForm.checkValidity()) {
+                if (cart.length === 0) return;
+
+                // Store order details for the success page
+                localStorage.setItem('orderCart', JSON.stringify(cart));
+                localStorage.setItem('orderTotal', cart.reduce((sum, item) => sum + (item.price * item.quantity), 0).toFixed(2));
+
+                // Reset form and clear cart
+                checkoutForm.reset();
+                cart = [];
+                updateCartCount();
+                renderCart();
+                selectPayment('credit', document.querySelector('.payment-method[onclick*="credit"]'));
+                hideCheckOut();
+                ToggleCart();
+                window.location.href = 'success.html';
+            }
+        });
     }
 });
 

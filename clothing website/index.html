@@ -81,7 +81,7 @@
         <div class="hero-content">
             <h1>Premium Fashion</h1>
             <p>Stars Collection For You To Be The STAR</p>
-            <a href="#products" class="cta-btn">Shop</a>
+            <a href="#products" class="cta-btn">SHOP</a>
         </div>
     </section>
     <main class="main-content">
@@ -135,7 +135,7 @@
                     <button class="back-to-cart" onclick="hideCheckOut()"><i class="fas fa-arrow-left"></i> Back to
                         Cart</button>
 
-                <form action="https://formspree.io/f/mrbybnkw" method="POST" onsubmit="processOrder(event)" autocomplete="off">
+                <form autocomplete="off" id="checkout-form-element">
                         <!-- Hidden field for Netlify to capture the selected payment method -->
                         <input type="hidden" name="payment-method" id="paymentMethodInput">
                     <!-- Hidden fields for Netlify to recognize cart data -->
@@ -225,7 +225,7 @@
                             </div>
                             <div class="total-price" id="checkOutTotal">Total: $0.00</div>
                             <button type="submit" class="place-order-btn" id="place-order-btn"><i
-                                    class="fas fa-rocket"></i>Order</button>
+                                    class="fas fa-rocket"></i> Place Order</button>
                     </form>
 
                 </div>
@@ -297,16 +297,6 @@
         </div>
     </div>
 
-    <!-- Order Success Modal -->
-    <div class="success-modal-overlay" id="successModalOverlay">
-        <div class="success-modal-content">
-            <div class="success-icon">
-                <i class="fas fa-check-circle"></i>
-            </div>
-            <h2>Order Placed!</h2>
-            <p>Thank you for your purchase. You will receive a confirmation email shortly.</p>
-        </div>
-    </div>
 
 
 
