@@ -337,7 +337,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 // Populate hidden fields
                 const cartSummaryString = cart.map(item =>
-                    `- ${item.title} (Image: ${item.images[0]}) (Quantity: ${item.quantity}) - Price: $${(item.price * item.quantity).toFixed(2)}`
+                    `- ${item.title} (Quantity: ${item.quantity}) - Price: $${(item.price * item.quantity).toFixed(2)}`
                 ).join('\n');
                 document.querySelector('input[name="cart-items"]').value = cartSummaryString;
                 document.querySelector('input[name="cart-total"]').value = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0).toFixed(2);
